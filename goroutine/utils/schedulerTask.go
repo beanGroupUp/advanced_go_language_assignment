@@ -269,7 +269,7 @@ func TestTask() {
 	for i := 1; i <= 10; i++ {
 		// 创建简单任务实例
 		task := &SimpleTask{
-			name: fmt.Sprintf("简单任务-%d", i),           // 设置任务名称
+			name: fmt.Sprintf("简单任务-%d", i),               // 设置任务名称
 			dur:  time.Duration(100*i) * time.Millisecond, // 设置执行时长（递增）
 		}
 		// 将任务添加到调度器
@@ -280,7 +280,7 @@ func TestTask() {
 	for i := 1; i <= 5; i++ {
 		// 创建可能失败的任务实例
 		task := &ErrorTask{
-			name: fmt.Sprintf("可能失败的任务-%d", i),     // 设置任务名称
+			name: fmt.Sprintf("可能失败的任务-%d", i),            // 设置任务名称
 			dur:  time.Duration(150*i) * time.Millisecond, // 设置执行时长（递增）
 		}
 		// 将任务添加到调度器
