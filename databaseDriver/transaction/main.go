@@ -3,10 +3,14 @@ package main
 import (
 	"awesomeProject3/databaseDriver/transaction/model"
 	"fmt"
+	"log"
+	"os"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 /**
@@ -164,14 +168,26 @@ defer 语句	正常执行	不会执行
 var db *gorm.DB
 
 func initDB() error {
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		logger.Config{
+			SlowThreshold:             time.Second, // Slow SQL threshold
+			LogLevel:                  logger.Info, // Log level
+			IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
+			ParameterizedQueries:      true,        // Don't include params in the SQL log
+			Colorful:                  true,        // Disable color
+		},
+	)
 	dsn := "root:123456@tcp(127.0.0.1:3306)/orm_test?charset=utf8mb4&parseTime=True&loc=Local"
 	var err error
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger: newLogger,
+	})
 	if err != nil {
 		panic(err)
 	}
 	//建表
-	err = db.AutoMigrate(&model.Accounts{}, &model.Transactions{})
+	//err = db.AutoMigrate(&model.Accounts{}, &model.Transactions{})
 	if err != nil {
 		panic(err)
 	}
@@ -258,8 +274,13 @@ func TransferMoneyManual(db *gorm.DB, fromAccountId uint, toAccountId uint, amou
 		return err
 	}
 
+	var toAccount model.Accounts
+	if err := tx.First(&toAccount, toAccountId).Error; err != nil {
+		tx.Rollback()
+	}
+
 	//4.增加转入账户余额
-	if err := tx.Model(&fromAccount).Update("balance", gorm.Expr("balance + ?", amount)).Error; err != nil {
+	if err := tx.Model(&toAccount).Update("balance", gorm.Expr("balance + ?", amount)).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
