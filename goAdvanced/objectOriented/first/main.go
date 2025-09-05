@@ -67,8 +67,8 @@ func main() {
 
 	//打印圆形的信息
 	fmt.Printf("圆形 - 半径：%.2f\n", circle.Radius) //圆形的半径
-	fmt.Printf("面积%v\n", circle.Area())           //调用圆形的Area方法
-	fmt.Printf("周长：%.2f\n", rect.Perimeter())     //调用圆形的Perimeter方法
+	fmt.Printf("面积%v\n", circle.Area())         //调用圆形的Area方法
+	fmt.Printf("周长：%.2f\n", rect.Perimeter())   //调用圆形的Perimeter方法
 
 	//演示使用Shape接口处理不同形状
 	fmt.Printf("\n使用Shape接口：")
