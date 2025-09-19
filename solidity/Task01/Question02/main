@@ -1,0 +1,58 @@
+// SPDX-License-Identifier: MIT
+// 指定编译器版本
+pragma solidity ^0.8.0;
+
+// 定义一个名为 ReverseString 的合约
+contract ReverseString {
+    // 定义一个名为 reverse 的公共纯函数（不读取也不修改状态）
+    // 它接收一个字符串类型的内存参数 _input，并返回一个字符串
+    function reverse(string memory _input) public pure returns (string memory) {
+        // 将输入的字符串转换为字节数组，以便能够逐个字符处理
+        // memory 关键字表示这个新数组存储在内存中
+        bytes memory inputBytes = bytes(_input);
+        // 获取字节数组的长度
+        uint256 length = inputBytes.length;
+        // 创建一个新的字节数组，用于存储反转后的字节，长度与输入相同
+        // memory 关键字表示这个新数组存储在内存中
+        bytes memory reversedBytes = new bytes(length);
+
+        // 循环遍历输入字节数组的每个位置
+        for (uint256 i = 0; i < length; i++) {
+            // 将输入字节数组从末尾开始（length-1-i）的字节赋值给新数组的第i个位置
+            reversedBytes[i] = inputBytes[length - 1 - i];
+        }
+
+        // 将反转后的字节数组转换回字符串类型并返回
+        return string(reversedBytes);
+    }
+}
+
+/**
+为什么需要 memory：
+
+new bytes(length) 动态地在内存中创建了一个新的字节数组
+
+任何使用 new 关键字创建的对象都必须指定存储位置
+
+由于这是一个局部变量，我们希望在函数执行完毕后自动清理，所以使用 memory
+
+如果尝试使用 storage 而不是 memory，会导致编译错误，因为不能动态创建存储数组
+
+内存 vs 存储的关键区别
+特性	内存 (memory)	存储 (storage)
+生命周期	函数执行期间	永久（区块链状态）
+成本	相对便宜	非常昂贵（修改状态）
+用途	临时计算	永久存储数据
+访问速度	快速	相对较慢
+总结
+在这两行代码中使用 memory 是因为：
+
+这两个变量都是局部变量，只在函数执行期间需要
+
+它们都是引用类型（数组），Solidity 要求明确指定存储位置
+
+使用 memory 比 storage 更便宜且更合适，因为我们不需要永久保存这些中间结果
+
+这是 Solidity 的语法要求，没有 memory 修饰符会导致编译错误
+
+这种设计是 Solidity 内存管理的一部分，旨在帮助开发者明确控制数据存储位置，从而优化 gas 消耗和防止意外的状态修改。*/
